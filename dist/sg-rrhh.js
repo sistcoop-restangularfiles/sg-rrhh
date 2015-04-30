@@ -92,4 +92,65 @@
 
     }]);
 
+    module.factory('SGAgencia', ['RrhhRestangular',  function(RrhhRestangular) {
+
+        var url = 'agencias';
+        var urlCodigo = url + '/codigo';
+        var urlCount = url + '/count';
+
+        var modelMethos = {
+            $new: function(id){
+                return angular.extend({id: id}, modelMethos);
+            },
+            $build: function(){
+                return angular.extend({id: undefined}, modelMethos, {$save: function(){
+                    return RrhhRestangular.all(url).post(this);
+                }});
+            },
+            $save: function() {
+                return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this),'',{},{});
+            },
+
+            $find: function(id){
+                return RrhhRestangular.one(url, id).get();
+            },
+            $search: function(queryParams){
+                return RrhhRestangular.all(url).getList(queryParams);
+            },
+
+            $findByCodigo: function(codigo){
+                return RrhhRestangular.one(urlCodigo, codigo).get();
+            },
+
+            $count: function(){
+                return RrhhRestangular.one(urlCount).get();
+            },
+
+            $disable: function(){
+                return RrhhRestangular.all(url+'/'+this.id+'/disable').post();
+            },
+            $remove: function(id){
+                return RrhhRestangular.one(url, id).remove();
+            }
+        };
+
+        RrhhRestangular.extendModel(url, function(obj) {
+            if(angular.isObject(obj)) {
+                return angular.extend(obj, modelMethos);
+            } else {
+                return angular.extend({id: obj}, modelMethos)
+            }
+        });
+        RrhhRestangular.extendModel(urlCodigo, function(obj) {
+            if(angular.isObject(obj)) {
+                return angular.extend(obj, modelMethos);
+            } else {
+                return angular.extend({id: obj}, modelMethos)
+            }
+        });
+
+        return modelMethos;
+
+    }]);
+
 })();
