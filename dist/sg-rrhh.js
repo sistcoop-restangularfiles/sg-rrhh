@@ -72,6 +72,9 @@
                 return RrhhRestangular.one(url, id).remove();
             },
 
+            $addAgencia: function(obj){
+                return RrhhRestangular.all(url + '/' + this.id + '/agencias').post(obj);
+            },
             $getAgencias: function(queryParams){
                 return RrhhRestangular.all(url+'/'+this.id+'/agencias').getList(queryParams);
             }
@@ -137,6 +140,9 @@
                 return RrhhRestangular.one(url, id).remove();
             },
 
+            $addTrabajador: function(obj){
+                return RrhhRestangular.all(url + '/' + this.id + '/trabajadores').post(obj);
+            },
             $getTrabajadores: function(queryParams){
                 return RrhhRestangular.all(url+'/'+this.id+'/trabajadores').getList(queryParams);
             }
