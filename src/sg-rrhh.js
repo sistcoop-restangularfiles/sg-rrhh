@@ -70,6 +70,10 @@
             },
             $remove: function(id){
                 return RrhhRestangular.one(url, id).remove();
+            },
+
+            $getAgencias: function(queryParams){
+                return RrhhRestangular.all(url+'/'+this.id+'/agencias').getList(queryParams);
             }
         };
 
@@ -131,6 +135,10 @@
             },
             $remove: function(id){
                 return RrhhRestangular.one(url, id).remove();
+            },
+
+            $getTrabajadores: function(queryParams){
+                return RrhhRestangular.all(url+'/'+this.id+'/trabajadores').getList(queryParams);
             }
         };
 
