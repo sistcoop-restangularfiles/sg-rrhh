@@ -34,6 +34,7 @@
     module.factory('SGSucursal', ['RrhhRestangular',  function(RrhhRestangular) {
 
         var url = 'sucursales';
+        var urlAbreviatura = url + '/abreviatura';
         var urlDenominacion = url + '/denominacion';
         var urlCount = url + '/count';
 
@@ -57,6 +58,9 @@
                 return RrhhRestangular.all(url).getList(queryParams);
             },
 
+            $findByAbreviatura: function(abreviatura){
+                return RrhhRestangular.one(urlAbreviatura, abreviatura).get();
+            },
             $findByDenominacion: function(denominacion){
                 return RrhhRestangular.one(urlDenominacion, denominacion).get();
             },
@@ -81,6 +85,13 @@
         };
 
         RrhhRestangular.extendModel(url, function(obj) {
+            if(angular.isObject(obj)) {
+                return angular.extend(obj, modelMethos);
+            } else {
+                return angular.extend({id: obj}, modelMethos)
+            }
+        });
+        RrhhRestangular.extendModel(urlAbreviatura, function(obj) {
             if(angular.isObject(obj)) {
                 return angular.extend(obj, modelMethos);
             } else {
