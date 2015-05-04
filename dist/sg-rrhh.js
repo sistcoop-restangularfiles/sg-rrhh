@@ -182,6 +182,7 @@
 
         var url = 'trabajadores';
         var urlCount = url + '/count';
+        var urlBuscar = url + '/buscar';
 
         var modelMethos = {
             $new: function(id){
@@ -213,10 +214,25 @@
             },
             $remove: function(id){
                 return RrhhRestangular.one(url, id).remove();
+            },
+
+            $findByTipoNumeroDocumento: function(tipoDocumento, numeroDocumento){
+                var params = {
+                    tipoDocumento: tipoDocumento,
+                    numeroDocumento: numeroDocumento
+                };
+                return RrhhRestangular.one(urlBuscar).get(params);
             }
         };
 
         RrhhRestangular.extendModel(url, function(obj) {
+            if(angular.isObject(obj)) {
+                return angular.extend(obj, modelMethos);
+            } else {
+                return angular.extend({id: obj}, modelMethos)
+            }
+        });
+        RrhhRestangular.extendModel(urlBuscar, function(obj) {
             if(angular.isObject(obj)) {
                 return angular.extend(obj, modelMethos);
             } else {
