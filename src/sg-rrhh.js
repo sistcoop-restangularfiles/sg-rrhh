@@ -156,6 +156,10 @@
             },
             $getTrabajadores: function(queryParams){
                 return RrhhRestangular.all(url+'/'+this.id+'/trabajadores').getList(queryParams);
+            },
+
+            $getSucursal: function(){
+                return RrhhRestangular.one(url+'/'+this.id+'/sucursal').get();
             }
         };
 
@@ -229,6 +233,10 @@
             },
             $getTrabajadorUsuario: function(){
                 return RrhhRestangular.one(url+'/'+this.id+'/trabajadorUsuarios').get();
+            },
+
+            $getAgencia: function(){
+                return RrhhRestangular.one(url+'/'+this.id+'/agencia').get();
             }
         };
 
@@ -280,6 +288,10 @@
             },
             $remove: function(id){
                 return RrhhRestangular.one(url, id).remove();
+            },
+
+            $findByUsuario: function(usuario){
+                return RrhhRestangular.one(url+'/usuario/'+usuario).get();
             }
         };
 
