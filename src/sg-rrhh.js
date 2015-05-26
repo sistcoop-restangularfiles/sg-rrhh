@@ -1,177 +1,164 @@
 'use strict';
 
-(function(){
+(function () {
 
     var module = angular.module('sg-rrhh', ['restangular']);
 
 
-    module.provider('sgRrhh', function() {
+    module.provider('sgRrhh', function () {
 
         this.restUrl = 'http://localhost';
 
-        this.$get = function() {
+        this.$get = function () {
             var restUrl = this.restUrl;
             return {
-                getRestUrl: function() {
+                getRestUrl: function () {
                     return restUrl;
                 }
             }
         };
 
-        this.setRestUrl = function(restUrl) {
+        this.setRestUrl = function (restUrl) {
             this.restUrl = restUrl;
         };
     });
 
 
-    module.factory('RrhhRestangular', ['Restangular', 'sgRrhh', function(Restangular, sgRrhh) {
-        return Restangular.withConfig(function(RestangularConfigurer) {
+    module.factory('RrhhRestangular', ['Restangular', 'sgRrhh', function (Restangular, sgRrhh) {
+        return Restangular.withConfig(function (RestangularConfigurer) {
             RestangularConfigurer.setBaseUrl(sgRrhh.getRestUrl());
         });
     }]);
 
 
-    module.factory('SGSucursal', ['RrhhRestangular',  function(RrhhRestangular) {
+    module.factory('SGSucursal', ['RrhhRestangular', function (RrhhRestangular) {
 
         var url = 'sucursales';
-        var urlAbreviatura = url + '/abreviatura';
-        var urlDenominacion = url + '/denominacion';
-        var urlCount = url + '/count';
 
         var modelMethos = {
-            $new: function(id){
-                return angular.extend({id: id}, modelMethos);
+
+            $new: function (id) {
+                return angular.extend({denominacion: id}, modelMethos);
             },
-            $build: function(){
-                return angular.extend({id: undefined}, modelMethos, {$save: function(){
-                    return RrhhRestangular.all(url).post(this);
-                }});
+            $build: function () {
+                return angular.extend({denominacion: undefined}, modelMethos, {
+                    $save: function () {
+                        return RrhhRestangular.all(url).post(this);
+                    }
+                });
             },
-            $save: function() {
-                return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this),'',{},{});
+            $save: function () {
+                return RrhhRestangular.one(url, this.denominacion).customPUT(RrhhRestangular.copy(this), '', {}, {});
             },
 
-            $find: function(id){
+            $find: function (id) {
                 return RrhhRestangular.one(url, id).get();
             },
-            $search: function(queryParams){
+            $search: function (queryParams) {
                 return RrhhRestangular.all(url).getList(queryParams);
             },
 
-            $findByAbreviatura: function(abreviatura){
-                return RrhhRestangular.one(urlAbreviatura, abreviatura).get();
-            },
-            $findByDenominacion: function(denominacion){
-                return RrhhRestangular.one(urlDenominacion, denominacion).get();
-            },
-
-            $count: function(){
-                return RrhhRestangular.one(urlCount).get();
-            },
-
-            $disable: function(){
-                return RrhhRestangular.all(url+'/'+this.id+'/disable').post();
-            },
-            $remove: function(id){
+            $remove: function (id) {
                 return RrhhRestangular.one(url, id).remove();
             },
 
-            $addAgencia: function(obj){
-                return RrhhRestangular.all(url + '/' + this.id + '/agencias').post(obj);
+            $addAgencia: function (obj) {
+                return RrhhRestangular.one(url, this.denominacion).all('agencias').post(obj);
             },
-            $getAgencias: function(queryParams){
-                return RrhhRestangular.all(url+'/'+this.id+'/agencias').getList(queryParams);
+            $getAgencias: function (queryParams) {
+                return RrhhRestangular.one(url, this.denominacion).all('agencias').getList(queryParams);
             }
+
         };
 
-        RrhhRestangular.extendModel(url, function(obj) {
-            if(angular.isObject(obj)) {
+        RrhhRestangular.extendModel(url, function (obj) {
+            if (angular.isObject(obj)) {
                 return angular.extend(obj, modelMethos);
             } else {
-                return angular.extend({id: obj}, modelMethos)
+                return angular.extend({denominacion: obj}, modelMethos)
             }
         });
-        RrhhRestangular.extendModel(urlAbreviatura, function(obj) {
-            if(angular.isObject(obj)) {
-                return angular.extend(obj, modelMethos);
-            } else {
-                return angular.extend({id: obj}, modelMethos)
-            }
-        });
-        RrhhRestangular.extendModel(urlDenominacion, function(obj) {
-            if(angular.isObject(obj)) {
-                return angular.extend(obj, modelMethos);
-            } else {
-                return angular.extend({id: obj}, modelMethos)
-            }
+        RrhhRestangular.extendCollection(url, function (collection) {
+            angular.forEach(collection, function (row) {
+                angular.extend(row, modelMethos);
+            });
+            return collection;
         });
 
         return modelMethos;
 
     }]);
 
-    module.factory('SGAgencia', ['RrhhRestangular',  function(RrhhRestangular) {
+    module.factory('SGAgencia', ['RrhhRestangular', function (RrhhRestangular) {
 
-        var url = 'agencias';
+        // /sucursales/{sucursal}/agencias
+        var sucursal = 'sucursales';
+        var url = '/agencias';
         var urlCodigo = url + '/codigo';
         var urlCount = url + '/count';
 
         var modelMethos = {
-            $new: function(id){
-                return angular.extend({id: id}, modelMethos);
-            },
-            $build: function(){
-                return angular.extend({id: undefined}, modelMethos, {$save: function(){
-                    return RrhhRestangular.all(url).post(this);
-                }});
-            },
-            $save: function() {
-                return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this),'',{},{});
+            $setSucursal: function (sucursal) {
+                url = 'sucursales/:sucursal/agencias';
             },
 
-            $find: function(id){
+            $new: function (id) {
+                return angular.extend({id: id}, modelMethos);
+            },
+            $build: function () {
+                return angular.extend({id: undefined}, modelMethos, {
+                    $save: function (sucursal) {
+                        return RrhhRestangular.all('sucursales/' + sucursal + url).post(this);
+                    }
+                });
+            },
+            $save: function (sucursal) {
+                return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this), '', {}, {});
+            },
+
+            $find: function (id) {
                 return RrhhRestangular.one(url, id).get();
             },
-            $search: function(queryParams){
+            $search: function (queryParams) {
                 return RrhhRestangular.all(url).getList(queryParams);
             },
 
-            $findByCodigo: function(codigo){
+            $findByCodigo: function (codigo) {
                 return RrhhRestangular.one(urlCodigo, codigo).get();
             },
 
-            $count: function(){
+            $count: function () {
                 return RrhhRestangular.one(urlCount).get();
             },
 
-            $disable: function(){
-                return RrhhRestangular.all(url+'/'+this.id+'/disable').post();
+            $disable: function () {
+                return RrhhRestangular.all(url + '/' + this.id + '/disable').post();
             },
-            $remove: function(id){
+            $remove: function (id) {
                 return RrhhRestangular.one(url, id).remove();
             },
 
-            $addTrabajador: function(obj){
+            $addTrabajador: function (obj) {
                 return RrhhRestangular.all(url + '/' + this.id + '/trabajadores').post(obj);
             },
-            $getTrabajadores: function(queryParams){
-                return RrhhRestangular.all(url+'/'+this.id+'/trabajadores').getList(queryParams);
+            $getTrabajadores: function (queryParams) {
+                return RrhhRestangular.all(url + '/' + this.id + '/trabajadores').getList(queryParams);
             },
 
-            $getSucursal: function(){
-                return RrhhRestangular.one(url+'/'+this.id+'/sucursal').get();
+            $getSucursal: function () {
+                return RrhhRestangular.one(url + '/' + this.id + '/sucursal').get();
             }
         };
 
-        RrhhRestangular.extendModel(url, function(obj) {
-            if(angular.isObject(obj)) {
+        RrhhRestangular.extendModel(url, function (obj) {
+            if (angular.isObject(obj)) {
                 return angular.extend(obj, modelMethos);
             } else {
                 return angular.extend({id: obj}, modelMethos)
             }
         });
-        RrhhRestangular.extendModel(urlCodigo, function(obj) {
-            if(angular.isObject(obj)) {
+        RrhhRestangular.extendModel(urlCodigo, function (obj) {
+            if (angular.isObject(obj)) {
                 return angular.extend(obj, modelMethos);
             } else {
                 return angular.extend({id: obj}, modelMethos)
@@ -182,45 +169,47 @@
 
     }]);
 
-    module.factory('SGTrabajador', ['RrhhRestangular',  function(RrhhRestangular) {
+    module.factory('SGTrabajador', ['RrhhRestangular', function (RrhhRestangular) {
 
         var url = 'trabajadores';
         var urlCount = url + '/count';
         var urlBuscar = url + '/buscar';
 
         var modelMethos = {
-            $new: function(id){
+            $new: function (id) {
                 return angular.extend({id: id}, modelMethos);
             },
-            $build: function(){
-                return angular.extend({id: undefined}, modelMethos, {$save: function(){
-                    return RrhhRestangular.all(url).post(this);
-                }});
+            $build: function () {
+                return angular.extend({id: undefined}, modelMethos, {
+                    $save: function () {
+                        return RrhhRestangular.all(url).post(this);
+                    }
+                });
             },
-            $save: function() {
-                return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this),'',{},{});
+            $save: function () {
+                return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this), '', {}, {});
             },
 
-            $find: function(id){
+            $find: function (id) {
                 return RrhhRestangular.one(url, id).get();
             },
-            $search: function(queryParams){
+            $search: function (queryParams) {
                 return RrhhRestangular.all(url).getList(queryParams);
             },
 
 
-            $count: function(){
+            $count: function () {
                 return RrhhRestangular.one(urlCount).get();
             },
 
-            $disable: function(){
-                return RrhhRestangular.all(url+'/'+this.id+'/disable').post();
+            $disable: function () {
+                return RrhhRestangular.all(url + '/' + this.id + '/disable').post();
             },
-            $remove: function(id){
+            $remove: function (id) {
                 return RrhhRestangular.one(url, id).remove();
             },
 
-            $findByTipoNumeroDocumento: function(tipoDocumento, numeroDocumento){
+            $findByTipoNumeroDocumento: function (tipoDocumento, numeroDocumento) {
                 var params = {
                     tipoDocumento: tipoDocumento,
                     numeroDocumento: numeroDocumento
@@ -228,27 +217,27 @@
                 return RrhhRestangular.one(urlBuscar).get(params);
             },
 
-            $addTrabajadorUsuario: function(obj){
+            $addTrabajadorUsuario: function (obj) {
                 return RrhhRestangular.all(url + '/' + this.id + '/trabajadorUsuarios').post(obj);
             },
-            $getTrabajadorUsuario: function(){
-                return RrhhRestangular.one(url+'/'+this.id+'/trabajadorUsuarios').get();
+            $getTrabajadorUsuario: function () {
+                return RrhhRestangular.one(url + '/' + this.id + '/trabajadorUsuarios').get();
             },
 
-            $getAgencia: function(){
-                return RrhhRestangular.one(url+'/'+this.id+'/agencia').get();
+            $getAgencia: function () {
+                return RrhhRestangular.one(url + '/' + this.id + '/agencia').get();
             }
         };
 
-        RrhhRestangular.extendModel(url, function(obj) {
-            if(angular.isObject(obj)) {
+        RrhhRestangular.extendModel(url, function (obj) {
+            if (angular.isObject(obj)) {
                 return angular.extend(obj, modelMethos);
             } else {
                 return angular.extend({id: obj}, modelMethos)
             }
         });
-        RrhhRestangular.extendModel(urlBuscar, function(obj) {
-            if(angular.isObject(obj)) {
+        RrhhRestangular.extendModel(urlBuscar, function (obj) {
+            if (angular.isObject(obj)) {
                 return angular.extend(obj, modelMethos);
             } else {
                 return angular.extend({id: obj}, modelMethos)
@@ -259,44 +248,46 @@
 
     }]);
 
-    module.factory('SGTrabajadorUsuario', ['RrhhRestangular',  function(RrhhRestangular) {
+    module.factory('SGTrabajadorUsuario', ['RrhhRestangular', function (RrhhRestangular) {
 
         var url = 'trabajadorUsuarios';
 
         var modelMethos = {
-            $new: function(id){
+            $new: function (id) {
                 return angular.extend({id: id}, modelMethos);
             },
-            $build: function(){
-                return angular.extend({id: undefined}, modelMethos, {$save: function(){
-                    return RrhhRestangular.all(url).post(this);
-                }});
+            $build: function () {
+                return angular.extend({id: undefined}, modelMethos, {
+                    $save: function () {
+                        return RrhhRestangular.all(url).post(this);
+                    }
+                });
             },
-            $save: function() {
-                return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this),'',{},{});
+            $save: function () {
+                return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this), '', {}, {});
             },
 
-            $find: function(id){
+            $find: function (id) {
                 return RrhhRestangular.one(url, id).get();
             },
-            $search: function(queryParams){
+            $search: function (queryParams) {
                 return RrhhRestangular.all(url).getList(queryParams);
             },
 
-            $disable: function(){
-                return RrhhRestangular.all(url+'/'+this.id+'/disable').post();
+            $disable: function () {
+                return RrhhRestangular.all(url + '/' + this.id + '/disable').post();
             },
-            $remove: function(id){
+            $remove: function (id) {
                 return RrhhRestangular.one(url, id).remove();
             },
 
-            $findByUsuario: function(usuario){
-                return RrhhRestangular.one(url+'/usuario/'+usuario).get();
+            $findByUsuario: function (usuario) {
+                return RrhhRestangular.one(url + '/usuario/' + usuario).get();
             }
         };
 
-        RrhhRestangular.extendModel(url, function(obj) {
-            if(angular.isObject(obj)) {
+        RrhhRestangular.extendModel(url, function (obj) {
+            if (angular.isObject(obj)) {
                 return angular.extend(obj, modelMethos);
             } else {
                 return angular.extend({id: obj}, modelMethos)
