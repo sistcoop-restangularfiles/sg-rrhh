@@ -151,13 +151,6 @@
                 return angular.extend({id: obj}, modelMethos)
             }
         });
-        RrhhRestangular.extendModel(urlCodigo, function (obj) {
-            if (angular.isObject(obj)) {
-                return angular.extend(obj, modelMethos);
-            } else {
-                return angular.extend({id: obj}, modelMethos)
-            }
-        });
 
         return modelMethos;
 
