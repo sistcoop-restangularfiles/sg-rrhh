@@ -159,7 +159,6 @@
     module.factory('SGTrabajador', ['RrhhRestangular', function (RrhhRestangular) {
 
         var url = 'trabajadores';
-        var urlCount = url + '/count';
         var urlBuscar = url + '/buscar';
 
         var modelMethos = {
@@ -173,8 +172,11 @@
                     }
                 });
             },
-            $save: function () {
-                return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this), '', {}, {});
+            $save: function (obj) {
+                if(angular.isUndefined(obj))
+                    return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this), '', {}, {});
+                else
+                    return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(obj), '', {}, {});
             },
 
             $find: function (id) {
@@ -184,16 +186,11 @@
                 return RrhhRestangular.all(url).getList(queryParams);
             },
 
-
-            $count: function () {
-                return RrhhRestangular.one(urlCount).get();
-            },
-
-            $disable: function () {
-                return RrhhRestangular.all(url + '/' + this.id + '/disable').post();
-            },
             $remove: function (id) {
-                return RrhhRestangular.one(url, id).remove();
+                if(angular.isUndefined(id))
+                    return RrhhRestangular.one(url, id).remove();
+                else
+                    return RrhhRestangular.one(url, this.id).remove();
             },
 
             $findByTipoNumeroDocumento: function (tipoDocumento, numeroDocumento) {
