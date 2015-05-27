@@ -47,8 +47,11 @@
                     }
                 });
             },
-            $save: function () {
-                return RrhhRestangular.one(url, this.denominacion).customPUT(RrhhRestangular.copy(this), '', {}, {});
+            $save: function (obj) {
+                if(angular.isUndefined(obj))
+                    return RrhhRestangular.one(url, this.denominacion).customPUT(RrhhRestangular.copy(this), '', {}, {});
+                else
+                    return RrhhRestangular.one(url, this.denominacion).customPUT(RrhhRestangular.copy(obj), '', {}, {});
             },
 
             $find: function (id) {
@@ -59,7 +62,10 @@
             },
 
             $remove: function (id) {
-                return RrhhRestangular.one(url, id).remove();
+                if(angular.isUndefined(id))
+                    return RrhhRestangular.one(url, this.denominacion).remove();
+                else
+                    return RrhhRestangular.one(url, id).remove();
             },
 
             $addAgencia: function (obj) {
