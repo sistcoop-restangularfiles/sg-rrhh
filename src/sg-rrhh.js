@@ -135,8 +135,8 @@
             },
 
 
-            $addTrabajador: function (obj) {
-                return RrhhRestangular.one('sucursales', sucursal).all(url + '/' + this.id + '/trabajadores').post(obj);
+            $addTrabajador: function (sucursal, agencia, obj) {
+                return RrhhRestangular.one('sucursales', sucursal).one(url, agencia).all('trabajadores').post(obj);
             },
             $getTrabajadores: function (queryParams) {
                 return RrhhRestangular.one('sucursales', sucursal).all(url + '/' + this.id + '/trabajadores').getList(queryParams);
