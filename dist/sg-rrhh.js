@@ -134,9 +134,6 @@
             $find: function (sucursal, id) {
                 return RrhhRestangular.one(url, id).get();
             },
-            $findById: function (id) {
-                return RrhhRestangular.all('id').one(url, id).get();
-            },
             $search: function (sucursal, queryParams) {
                 return RrhhRestangular.all(url).getList(queryParams);
             },
@@ -221,15 +218,15 @@
                 return RrhhRestangular.one(urlBuscar).get(params);
             },
 
-            $addTrabajadorUsuario: function (obj) {
-                return RrhhRestangular.all(url + '/' + this.id + '/trabajadorUsuarios').post(obj);
+            $getUsuario: function () {
+                return RrhhRestangular.one(url, this.id).all('usuario').get();
             },
-            $getTrabajadorUsuario: function () {
-                return RrhhRestangular.one(url + '/' + this.id + '/trabajadorUsuarios').get();
+            $setUsuario: function (usuario) {
+                return RrhhRestangular.one(url, this.id).all('usuario').post(usuario);
             },
 
             $getAgencia: function () {
-                return RrhhRestangular.one(url + '/' + this.id + '/agencia').get();
+                return RrhhRestangular.one(url, this.id).all('agencia').get();
             }
         };
 
