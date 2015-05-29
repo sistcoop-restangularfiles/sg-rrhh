@@ -57,6 +57,9 @@
             $find: function (id) {
                 return RrhhRestangular.one(url, id).get();
             },
+            $findById: function (id) {
+                return RrhhRestangular.all(url).one('id', id).get();
+            },
             $search: function (queryParams) {
                 return RrhhRestangular.all(url).getList(queryParams);
             },
@@ -68,11 +71,20 @@
                     return RrhhRestangular.one(url, id).remove();
             },
 
-            $addAgencia: function (obj) {
-                return RrhhRestangular.one(url, this.denominacion).all('agencias').post(obj);
+            $findAgencia: function (id) {
+                return RrhhRestangular.one(url, this.denominacion).one('agencias', id).get();
             },
             $getAgencias: function (queryParams) {
                 return RrhhRestangular.one(url, this.denominacion).all('agencias').getList(queryParams);
+            },
+            $addAgencia: function (obj) {
+                return RrhhRestangular.one(url, this.denominacion).all('agencias').post(obj);
+            },
+            $updateAgencia: function (id, obj) {
+                return RrhhRestangular.one(url, this.denominacion).one('agencias', id).customPUT(RrhhRestangular.copy(obj), '', {}, {});
+            },
+            $removeAgencia: function (id) {
+                return RrhhRestangular.one(url, this.denominacion).one('agencias', id).remove();
             }
 
         };
