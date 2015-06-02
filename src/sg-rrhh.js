@@ -113,6 +113,13 @@
 
         var modelMethos = {
 
+            $findByUrl: function(absoluteUrl){
+                return RrhhRestangular.oneUrl('agencias', absoluteUrl).get();
+            },
+            $getUrl: function(){
+                return RrhhRestangular.one(url, this.id).getRestangularUrl();
+            },
+
             $new: function (id) {
                 return angular.extend({id: id}, modelMethos);
             },
@@ -131,10 +138,10 @@
             },
 
 
-            $find: function (sucursal, id) {
+            $find: function (id) {
                 return RrhhRestangular.one(url, id).get();
             },
-            $search: function (sucursal, queryParams) {
+            $search: function (queryParams) {
                 return RrhhRestangular.all(url).getList(queryParams);
             },
 
