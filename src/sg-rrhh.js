@@ -229,7 +229,7 @@
                 return RrhhRestangular.one(url, this.id).all('usuario').get();
             },
             $setUsuario: function (usuario) {
-                return RrhhRestangular.one(url, this.id).all('usuario').post(usuario);
+                return RrhhRestangular.one(url, this.id).all('usuario').post({usuario: usuario});
             },
 
             $getAgencia: function () {
