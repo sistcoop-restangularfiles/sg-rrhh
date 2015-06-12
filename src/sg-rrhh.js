@@ -217,11 +217,7 @@
                     return RrhhRestangular.one(url, this.id).remove();
             },
 
-            $findByTipoNumeroDocumento: function (tipoDocumento, numeroDocumento) {
-                var params = {
-                    tipoDocumento: tipoDocumento,
-                    numeroDocumento: numeroDocumento
-                };
+            $findByAtributos: function (params) {
                 return RrhhRestangular.one(urlBuscar).get(params);
             },
 
