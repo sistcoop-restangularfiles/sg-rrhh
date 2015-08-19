@@ -30,275 +30,115 @@
         });
     }]);
 
+    var RestObject = function (path, restangular, extendMethods) {
+        var modelMethods = {
 
-    module.factory('SGSucursal', ['RrhhRestangular', function (RrhhRestangular) {
+            /**
+             * Retorna url*/
+            $getModelMethods: function () {
+                return modelMethods;
+            },
 
-        var url = 'sucursales';
+            /**
+             * Retorna url*/
+            $getBasePath: function () {
+                return path;
+            },
+            /**
+             * Retorna la url completa del objeto*/
+            $getAbsoluteUrl: function () {
+                return restangular.one(path, this.id).getRestangularUrl();
+            },
+            /**
+             * Concatena la url de subresource con la url base y la retorna*/
+            $concatSubResourcePath: function (subResourcePath) {
+                return this.$getBasePath() + '/' + this.id + '/' + subResourcePath;
+            },
 
-        var modelMethos = {
 
             $new: function (id) {
-                return angular.extend({denominacion: id}, modelMethos);
+                return angular.extend({id: id}, modelMethods);
             },
             $build: function () {
-                return angular.extend({denominacion: undefined}, modelMethos, {
+                return angular.extend({id: undefined}, modelMethods, {
                     $save: function () {
-                        return RrhhRestangular.all(url).post(this);
+                        return restangular.all(path).post(this);
                     }
                 });
             },
-            $save: function (obj) {
-                if(angular.isUndefined(obj))
-                    return RrhhRestangular.one(url, this.denominacion).customPUT(RrhhRestangular.copy(this), '', {}, {});
-                else
-                    return RrhhRestangular.one(url, this.denominacion).customPUT(RrhhRestangular.copy(obj), '', {}, {});
+
+            $search: function (queryParams) {
+                return restangular.all(path).customGET('', queryParams);
             },
 
             $find: function (id) {
-                return RrhhRestangular.one(url, id).get();
+                return restangular.one(path, id).get();
             },
-            $findById: function (id) {
-                return RrhhRestangular.all(url).one('id', id).get();
+            $save: function () {
+                return restangular.one(path, this.id).customPUT(restangular.copy(this), '', {}, {});
             },
-            $search: function (queryParams) {
-                return RrhhRestangular.all(url).getList(queryParams);
-            },
-
-            $remove: function (id) {
-                if(angular.isUndefined(id))
-                    return RrhhRestangular.one(url, this.denominacion).remove();
-                else
-                    return RrhhRestangular.one(url, id).remove();
+            $saveSent: function (obj) {
+                return restangular.all(path).post(obj);
             },
 
-            $findAgencia: function (id) {
-                return RrhhRestangular.one(url, this.denominacion).one('agencias', id).get();
+            $enable: function () {
+                return restangular.one(path, this.id).all('enable').post();
             },
-            $getAgencias: function (queryParams) {
-                return RrhhRestangular.one(url, this.denominacion).all('agencias').getList(queryParams);
+            $disable: function () {
+                return restangular.one(path, this.id).all('disable').post();
             },
-            $addAgencia: function (obj) {
-                return RrhhRestangular.one(url, this.denominacion).all('agencias').post(obj);
-            },
-            $updateAgencia: function (id, obj) {
-                return RrhhRestangular.one(url, this.denominacion).one('agencias', id).customPUT(RrhhRestangular.copy(obj), '', {}, {});
-            },
-            $removeAgencia: function (id) {
-                return RrhhRestangular.one(url, this.denominacion).one('agencias', id).remove();
+            $remove: function () {
+                return restangular.one(path, this.id).remove();
             }
-
         };
 
-        RrhhRestangular.extendModel(url, function (obj) {
+        modelMethods = angular.extend(modelMethods, extendMethods);
+
+        restangular.extendModel(path, function (obj) {
             if (angular.isObject(obj)) {
-                return angular.extend(obj, modelMethos);
+                return angular.extend(obj, modelMethods);
             } else {
-                return angular.extend({denominacion: obj}, modelMethos)
+                return angular.extend({id: obj}, modelMethods)
             }
         });
-        RrhhRestangular.extendCollection(url, function (collection) {
+
+        restangular.extendCollection(path, function (collection) {
             angular.forEach(collection, function (row) {
-                angular.extend(row, modelMethos);
+                angular.extend(row, modelMethods);
             });
             return collection;
         });
 
-        return modelMethos;
+        return modelMethods;
+    };
 
-    }]);
+    module.factory('SGSucursal', ['RrhhRestangular', function (RrhhRestangular) {
 
-    module.factory('SGAgencia', ['RrhhRestangular', function (RrhhRestangular) {
+        var extendMethod = {};
 
-        var url = 'agencias';
+        var sucursalesResource = RestObject('sucursales', RrhhRestangular, extendMethod);
 
-        var modelMethos = {
+        /**
+         * Accionistas*
+         * */
+        sucursalesResource.SGAgencia = function () {
+            var extendMethod = {};
 
-            $findByUrl: function(absoluteUrl){
-                return RrhhRestangular.oneUrl('agencias', absoluteUrl).get();
-            },
-            $getUrl: function(){
-                return RrhhRestangular.one(url, this.id).getRestangularUrl();
-            },
+            var agenciasSubResource = RestObject(this.$concatSubResourcePath('agencias'), RrhhRestangular, extendMethod);
 
-            $new: function (id) {
-                return angular.extend({id: id}, modelMethos);
-            },
-            $build: function () {
-                return angular.extend({id: undefined}, modelMethos, {
-                    $save: function () {
-                        return RrhhRestangular.all(url).post(this);
-                    }
-                });
-            },
-            $save: function (obj) {
-                if(angular.isUndefined(obj))
-                    return RrhhRestangular.all(url).customPUT(RrhhRestangular.copy(this), '', {}, {});
-                else
-                    return RrhhRestangular.all(url).customPUT(RrhhRestangular.copy(obj), '', {}, {});
-            },
+            agenciasSubResource.SGTrabajador = function () {
+                var extendMethod = {};
+
+                var trabajadoresSubResource = RestObject(this.$concatSubResourcePath('trabajadores'), RrhhRestangular, extendMethod);
 
 
-            $find: function (id) {
-                return RrhhRestangular.one(url, id).get();
-            },
-            $search: function (queryParams) {
-                return RrhhRestangular.all(url).getList(queryParams);
-            },
+                return trabajadoresSubResource;
+            };
 
-
-            $remove: function (id) {
-                if(angular.isUndefined(id))
-                    return RrhhRestangular.one(url, this.id).remove();
-                else
-                    return RrhhRestangular.one(url, id).remove();
-            },
-
-            $getTrabajadores: function (queryParams) {
-                return RrhhRestangular.one(url, this.id).all('trabajadores').getList(queryParams);
-            },
-            $addTrabajador: function (obj) {
-                return RrhhRestangular.one(url, this.id).all('trabajadores').post(obj);
-            },
-            $updateTrabajador: function (id, obj) {
-                return RrhhRestangular.one(url, this.id).one('trabajadores', id).customPUT(RrhhRestangular.copy(obj), '', {}, {});
-            },
-            $removeTrabajador: function (id) {
-                return RrhhRestangular.one(url, this.id).one('trabajadores', id).remove();
-            }
-
+            return agenciasSubResource;
         };
 
-        RrhhRestangular.extendModel(url, function (obj) {
-            if (angular.isObject(obj)) {
-                return angular.extend(obj, modelMethos);
-            } else {
-                return angular.extend({id: obj}, modelMethos)
-            }
-        });
-
-        return modelMethos;
-
-    }]);
-
-    module.factory('SGTrabajador', ['RrhhRestangular', function (RrhhRestangular) {
-
-        var url = 'trabajadores';
-        var urlBuscar = url + '/buscar';
-
-        var modelMethos = {
-            $new: function (id) {
-                return angular.extend({id: id}, modelMethos);
-            },
-            $build: function () {
-                return angular.extend({id: undefined}, modelMethos, {
-                    $save: function () {
-                        return RrhhRestangular.all(url).post(this);
-                    }
-                });
-            },
-            $save: function (obj) {
-                if(angular.isUndefined(obj))
-                    return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this), '', {}, {});
-                else
-                    return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(obj), '', {}, {});
-            },
-
-            $find: function (id) {
-                return RrhhRestangular.one(url, id).get();
-            },
-            $search: function (queryParams) {
-                return RrhhRestangular.all(url).getList(queryParams);
-            },
-
-            $remove: function (id) {
-                if(angular.isUndefined(id))
-                    return RrhhRestangular.one(url, id).remove();
-                else
-                    return RrhhRestangular.one(url, this.id).remove();
-            },
-
-            $findByAtributos: function (params) {
-                return RrhhRestangular.one(urlBuscar).get(params);
-            },
-
-            $getUsuario: function () {
-                return RrhhRestangular.one(url, this.id).all('usuario').get();
-            },
-            $setUsuario: function (usuario) {
-                return RrhhRestangular.one(url, this.id).all('usuario').post({usuario: usuario});
-            },
-
-            $getAgencia: function () {
-                return RrhhRestangular.one(url, this.id).all('agencia').get();
-            }
-        };
-
-        RrhhRestangular.extendModel(url, function (obj) {
-            if (angular.isObject(obj)) {
-                return angular.extend(obj, modelMethos);
-            } else {
-                return angular.extend({id: obj}, modelMethos)
-            }
-        });
-        RrhhRestangular.extendModel(urlBuscar, function (obj) {
-            if (angular.isObject(obj)) {
-                return angular.extend(obj, modelMethos);
-            } else {
-                return angular.extend({id: obj}, modelMethos)
-            }
-        });
-
-        return modelMethos;
-
-    }]);
-
-    module.factory('SGTrabajadorUsuario', ['RrhhRestangular', function (RrhhRestangular) {
-
-        var url = 'trabajadorUsuarios';
-
-        var modelMethos = {
-            $new: function (id) {
-                return angular.extend({id: id}, modelMethos);
-            },
-            $build: function () {
-                return angular.extend({id: undefined}, modelMethos, {
-                    $save: function () {
-                        return RrhhRestangular.all(url).post(this);
-                    }
-                });
-            },
-            $save: function () {
-                return RrhhRestangular.one(url, this.id).customPUT(RrhhRestangular.copy(this), '', {}, {});
-            },
-
-            $find: function (id) {
-                return RrhhRestangular.one(url, id).get();
-            },
-            $search: function (queryParams) {
-                return RrhhRestangular.all(url).getList(queryParams);
-            },
-
-            $disable: function () {
-                return RrhhRestangular.all(url + '/' + this.id + '/disable').post();
-            },
-            $remove: function (id) {
-                return RrhhRestangular.one(url, id).remove();
-            },
-
-            $findByUsuario: function (usuario) {
-                return RrhhRestangular.one(url + '/usuario/' + usuario).get();
-            }
-        };
-
-        RrhhRestangular.extendModel(url, function (obj) {
-            if (angular.isObject(obj)) {
-                return angular.extend(obj, modelMethos);
-            } else {
-                return angular.extend({id: obj}, modelMethos)
-            }
-        });
-
-        return modelMethos;
+        return sucursalesResource;
 
     }]);
 
