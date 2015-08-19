@@ -96,7 +96,7 @@
 
         restangular.extendModel(path, function (obj) {
             if (angular.isObject(obj)) {
-                if (angular.isDefined(obj.items)) {
+                if (angular.isDefined(obj.items) && angular.isArray(obj.items)) {
                     angular.forEach(obj.items, function (row) {
                         angular.extend(row, modelMethods);
                     });
