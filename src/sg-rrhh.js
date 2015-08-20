@@ -147,4 +147,14 @@
 
     }]);
 
+    module.factory('SGTrabajador', ['RrhhRestangular', function (RrhhRestangular) {
+
+        var extendMethod = {};
+
+        var trabajadoresResource = RestObject('trabajadores', RrhhRestangular, extendMethod);
+
+        return trabajadoresResource;
+
+    }]);
+
 })();
