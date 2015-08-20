@@ -149,7 +149,15 @@
 
     module.factory('SGTrabajador', ['RrhhRestangular', function (RrhhRestangular) {
 
-        var extendMethod = {};
+        var extendMethod = {
+            $setUsuario: function () {
+                return RrhhRestangular.one(this.$getBasePath(), this.id).all('usuario').customPUT(RrhhRestangular.copy(this), '', {}, {});
+                ;
+            },
+            $removeUsuario: function () {
+                return RrhhRestangular.one(this.$getBasePath(), this.id).all('usuario').remove();
+            }
+        };
 
         var trabajadoresResource = RestObject('trabajadores', RrhhRestangular, extendMethod);
 
